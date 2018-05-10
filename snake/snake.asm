@@ -91,8 +91,8 @@ isFruitAlive proc near
     jne @@check_next
 @@exit:
   ret
-
 isFruitAlive endp
+
 main proc near
   call isFruitAlive
   call @@draw
@@ -102,6 +102,12 @@ main proc near
     cmp    bx, tail
     jz    @@lop
     call read_buf
+    cmp al, 9
+    jge @@custom_speed_lvl
+    cmp al, 7
+    je @@custom_speed_up
+    cmp al, 8 
+    je @@custom_speed_down
     cmp al, 6
     je @@pause
     cmp al, 4
@@ -110,10 +116,26 @@ main proc near
     jl @@change_next_direction
     je @@move
     jmp @@lop
-
 reboot:
   int 19h
-
+@@custom_speed_lvl:
+	sub al, 0Fh
+	mov speed_level,al
+	mov game_speed, 07h
+	sub game_speed, al
+	jmp @@lop
+@@custom_speed_down:
+	cmp speed_level, 0
+	je @@lop
+	dec speed_level
+	inc game_speed
+	jmp @@lop
+@@custom_speed_up:
+	cmp speed_level, 6
+	je @@lop
+	inc speed_level
+	dec game_speed
+	jmp @@lop
 @@pause:
   xor working, 1
   jmp @@lop
@@ -290,8 +312,8 @@ reboot:
 
 @@end_draw:
   call @@draw_fruit
-  mov ch, snake[0].X
-  mov cl, snake[0].Y
+  mov cx, snake[0]
+  xchg ch, cl
   call @@get_position
   mov al,'@'
   stosw
@@ -317,15 +339,21 @@ reboot:
 @@speed_up:
   cmp speed_level, 6
   je @@end_speed_up
-  mov dl, byte ptr snake_size
-  mov bl, speed_level
-  xor bh,bh
-  cmp dl, speed_up_size[bx]
-  jne @@end_speed_up
+  mov ax, snake_size
+  mov bl, speed_up_size
+  div bl
+  test ah,ah
+  jnz @@change_upped
+  cmp speed_upped, 1
+  je @@end_speed_up
+  mov speed_upped, 1
   inc speed_level
   dec game_speed
 @@end_speed_up:
   ret
+@@change_upped:
+	mov speed_upped, 0
+	jmp @@end_speed_up
 @@check_crossing:
     mov ax, snake[0]
     mov si, 2
@@ -422,7 +450,7 @@ drawstat proc near
 @@drawGameName:
   mov dx, 0104h
   mov bp, offset gamename
-  mov cx, 13
+  mov cx, 10
   call write_string
   ret
 write_string: ;в cx - длина строки, в bp - offset строки dx - позиция
@@ -438,7 +466,7 @@ write_string: ;в cx - длина строки, в bp - offset строки dx -
   ret
 drawstat endp
 
-buf db 10 dup(0)
+buf db 15 dup(0)
 bufend:
 head dw offset buf
 tail dw offset buf
@@ -470,6 +498,21 @@ new_int9 proc near
 cli
     push ax
     in    al, 60h
+
+    cmp al, 82h
+    je @@set_speed_lvl
+    cmp al, 83h
+    je @@set_speed_lvl
+    cmp al, 84h
+    je @@set_speed_lvl
+    cmp al, 85h
+    je @@set_speed_lvl
+    cmp al, 86h
+    je @@set_speed_lvl
+    cmp al, 87h
+    je @@set_speed_lvl
+      cmp al, 88h
+    je @@set_speed_lvl
     cmp al, 81h
     je @@set_reboot
     cmp al, 0CDh
@@ -482,9 +525,23 @@ cli
     je @@set_bot
     cmp al, 0b9h
     je @@set_pause
-
+    cmp al, 08dh
+    je @@set_speed_up
+    cmp al, 08ch
+    je @@set_speed_down
     jmp @@exit
-    
+@@set_speed_lvl:
+	push ax
+	sub al, 73h
+	jmp @@write_to_buf
+@@set_speed_up: 
+	push ax
+	mov al, 7
+	jmp @@write_to_buf
+@@set_speed_down:
+	push ax
+	mov al, 8
+	jmp @@write_to_buf    
 @@set_pause:
   push ax
   mov al,6 
@@ -529,6 +586,7 @@ cli
   iret
 
 new_int9 endp
+
 write_num_in_ax proc near ;ax - number, di - position to draw
   mov bx, 10 
   xor cx, cx 
@@ -559,7 +617,6 @@ new_timer proc near
     push ax
     cmp working, 0
     je @@exit
-    
     inc time_tick
     mov al, time_tick
     cmp time_tick_sec,  al
@@ -570,7 +627,7 @@ new_timer proc near
 @@check_tick:
     mov al, game_speed
     cmp cs:ticks_count, al
-    je @@tick
+    jge @@tick
     jmp @@exit
 @@add_sec:
     inc seconds
@@ -605,7 +662,7 @@ next_direction db 0
 direction db 0  ;0 - вправо, 1  - влево, 2 - вверх, 3 - вниз
 score dw 0
 seconds dw 0
-gamename db 'SUPERSNAKE999'
+gamename db 'SUPERSNAKE'
 score_name db 'Score:'
 time db 'Time:'
 size_text db 'Snake size:'
@@ -613,7 +670,8 @@ speed_text db 'Speed level:'
 game_over db 'GAME OVER'
 is_game_over db 0
 fruit pos <255,255>
-speed_up_size db 14, 26, 38, 46, 56, 70, 90
+speed_up_size db 12
+speed_upped db 0
 snake_size dw 8 ;Указывается в 2 раза больше(реальное значение = snake_size/2)
 snake pos <82,10>, <80, 10>,<78, 10>,<76, 10>
 end start
