@@ -13,7 +13,7 @@ start:
     jmp main
 
 include dir.asm
-include intChanger.asm
+include ints.asm
 include buffer.asm
 include Fruit.asm
 include Draw.asm
@@ -21,14 +21,14 @@ include Draw.asm
 reboot:
   int 19h
 
-main proc near
+main proc 
   call isFruitAlive
   call draw
-@@lop: 
+mainLoop: 
     hlt
     mov    bx, head
     cmp    bx, tail
-    jz    @@lop
+    jz    mainLoop
     call read_buf
     cmp al, 9
     jge @@custom_speed_lvl
@@ -43,31 +43,31 @@ main proc near
     cmp al, 5
     jl @@change_next_direction
     je @@move
-    jmp @@lop
+    jmp mainLoop
 @@custom_speed_lvl:
 	sub al, 0Fh
 	mov speed_level,al
 	mov game_speed, 07h
 	sub game_speed, al
-	jmp @@lop
+	jmp mainLoop
 @@custom_speed_down:
 	cmp speed_level, 0
-	je @@lop
+	je mainLoop
 	dec speed_level
 	inc game_speed
-	jmp @@lop
+	jmp mainLoop
 @@custom_speed_up:
 	cmp speed_level, 6
-	je @@lop
+	je mainLoop
 	inc speed_level
 	dec game_speed
-	jmp @@lop
+	jmp mainLoop
 @@pause:
   xor working, 1
-  jmp @@lop
+  jmp mainLoop
 @@change_next_direction:
     mov next_direction, al
-    jmp @@lop
+    jmp mainLoop
 @@move:
   call @@speed_up
   call change_direction
@@ -239,9 +239,6 @@ GAMEOVER proc near
   jmp reboot
 GAMEOVER endp
 
-end start
-
-.data
 working db 1
 time_tick db 0
 ticks_count db 0
@@ -268,3 +265,5 @@ speed_up_size db 12
 speed_upped db 0
 snake_size dw 8 ;Указывается в 2 раза больше(реальное значение = snake_size/2)
 snake pos <82,10>, <80, 10>,<78, 10>,<76, 10>
+
+end start

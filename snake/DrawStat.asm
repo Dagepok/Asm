@@ -1,5 +1,5 @@
 
-include writeNumAx.asm
+include drawN.asm
 
 drawstat proc near
   call @@drawSeparator

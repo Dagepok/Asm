@@ -1,4 +1,5 @@
-include drawstat
+include drawstat.asm
+
 
 draw proc 
     call clear_screen
@@ -15,6 +16,7 @@ draw_fruit:
   call get_position
   stosw
   ret
+
 drawpos:
     cmp si, snake_size
     je end_draw
@@ -45,8 +47,9 @@ end_draw:
   stosw
   call drawstat
   cmp is_game_over, 1
-  je GAMEOVER
-  jmp lop
+  je @@jmp_to_gameover
+  jmp mainLoop
+
 clear_screen:
   mov ax, 0B800h
   mov di, 0
@@ -55,11 +58,12 @@ clear_screen:
   mov cx, 4000
   rep stosw
   ret
-
 remove_cursor:
   mov    ah, 2
   xor    bh,bh
   mov    dx, 8126
   int    10h
   ret
+@@jmp_to_gameover:
+    jmp GAMEOVER
 draw endp

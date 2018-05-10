@@ -1,3 +1,4 @@
+
 _change_int9h:
     xor ax,ax
     mov ds,ax
@@ -10,6 +11,7 @@ _change_int9h:
     push cs
     pop ds
     ret
+    
 _change_int8h:
     cli
     xor ax, ax
@@ -121,7 +123,7 @@ cli
 new_int9 endp
 
 
-new_timer proc near
+new_timer proc
     cli
     push ax
     cmp working, 0

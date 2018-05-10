@@ -1,4 +1,4 @@
-write_num_in_ax proc near ;ax - number, di - position to draw
+write_num_in_ax proc ;ax - number, di - position to draw
   mov bx, 10 
   xor cx, cx 
 @@div: 
