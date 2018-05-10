@@ -1,5 +1,3 @@
-locals
-
 get_random_num proc
   mov   ax,[seed]             ;считать последнее случайное число
   test  ax,ax                 ;проверить его, если это -1,

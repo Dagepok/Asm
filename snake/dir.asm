@@ -1,5 +1,3 @@
-locals 
-
 change_direction proc 
 @@start:
     cmp direction, 1
@@ -48,7 +46,7 @@ change_direction proc
     cmp bl, snake[2].X
     je @@end_changing_head
     jne @@check_Y
-@@checkRight:
+@@checkRight: 
     sub bl, 2
     cmp bl, snake[2].X
     je @@end_changing_head
