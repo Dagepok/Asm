@@ -84,25 +84,25 @@ mainLoop:
   mov al, direction
   cmp al, 2 
   jl @@left_right
+  jmp @@up_down
+@@reverse:
+	mov cx, snake[si]
+    mov snake[bx], cx
+    sub si, 2
+    sub bx, 2
+    cmp bx, 0  
+    jne @@reverse
+    ret
 @@up_down:
       cmp al, 3
       je @@down
 @@up:
-    mov cx, snake[si]
-    mov snake[bx], cx
-    sub si, 2
-    sub bx, 2
-    cmp bx, 0  
-    jne @@up
+    call @@reverse
     dec snake[0].Y
     jmp @@check_poses
+
 @@down:
-   mov cx, snake[si]
-    mov snake[bx], cx
-    sub si, 2
-    sub bx, 2
-    cmp bx, 0  
-    jne @@down
+   call @@reverse
     inc snake[0].Y
     jmp @@check_poses
 @@left_right:
@@ -110,21 +110,11 @@ mainLoop:
     jne @@left
    
 @@right:
-    mov cx, snake[si]
-    mov snake[bx], cx
-    sub si, 2
-    sub bx, 2
-    cmp bx, 0  
-    jne @@right
+    call @@reverse
     add snake[0].X, 2
     jmp @@check_poses
 @@left:
-    mov cx, snake[si]
-    mov snake[bx], cx
-    sub si, 2
-    sub bx, 2
-    cmp bx, 0  
-    jne @@left
+    call @@reverse
     sub snake[0].X, 2
     jmp @@check_poses
 @@end_check_pos:
