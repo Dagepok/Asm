@@ -51,15 +51,22 @@ drawstat proc near
   call write_num_in_ax
   ret
 @@drawSeparator:
-  mov di, 40
-  mov al, 0DDh
+  mov di, 38
+  mov al, 0b1h
   mov cx, 25
   mov dx, 158
-@@drawSep:
+  call @@drawSepl
+  mov di, 158
+  mov cx, 25
+  call @@drawSepl
+  ret
+
+@@drawSepl:
   stosw
   add di, dx
-  loop @@drawSep
+  loop @@drawSepl
   ret
+
 @@drawGameName:
   mov dx, 0104h
   mov bp, offset gamename

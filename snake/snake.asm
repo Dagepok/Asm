@@ -12,12 +12,12 @@ start:
     call _change_int9h
     jmp main
 
+include walls.asm
 include dir.asm
 include ints.asm
 include buffer.asm
 include Fruit.asm
 include Draw.asm
-
 reboot:
   int 19h
 
@@ -133,6 +133,7 @@ mainLoop:
 
 @@check_poses:
     call @@check_crossing
+    call check_walls
     xor si,si
     @@check_pos:
       cmp si, snake_size
@@ -147,16 +148,16 @@ mainLoop:
     mov snake[si].X, al
     ret
 @@check1:
-    cmp al, 40
+    cmp al, 38
     je @@set_max_line
-    cmp al, 160
+    cmp al, 158
     je @@set_min_line
     ret
 @@set_min_line:
-    mov al, 42
+    mov al, 40
     ret
 @@set_max_line:
-    mov al, 158
+    mov al, 156
     ret
 @@check_col:
     mov al, snake[si].Y
@@ -164,10 +165,12 @@ mainLoop:
     mov snake[si].Y, al
     ret
 @@check2:
-    cmp al, -1
-    je @@set_max_col
-    cmp al, 25
-    je @@set_min_col
+    cmp al, 0
+    ;je @@set_max_col
+    je GAMEOVER
+    cmp al, 24
+    je GAMEOVER
+    ;je @@set_min_col
     ret
 @@set_min_col:
     xor al,al
@@ -254,6 +257,6 @@ fruit pos <255,255>
 speed_up_size db 12
 speed_upped db 0
 snake_size dw 8 ;Указывается в 2 раза больше(реальное значение = snake_size/2)
-snake pos <82,10>, <80, 10>,<78, 10>,<76, 10>
+snake pos <62,3>, <60, 3>,<58, 3>,<56, 3>
 
 end start
