@@ -42,7 +42,9 @@ set_current proc
 	cmp si, bx
 	jge @@let_down_string
 	cld
+	push bx
 	call ask_name
+	pop bx
 	mov si, bx
 	mov di, offset dname 
 	xchg di, si
@@ -51,11 +53,73 @@ set_current proc
 	mov ax, score
 	mov [di],ax
 @@end:
-	ret
+	mov is_asking_name, 0
+	mov score_added, 1
+	jmp draw
 set_current endp
 
 ask_name proc
-
+ 	push es
+  	push cs
+  	pop es
+	mov bp, offset uname
+	mov dx, 0D25h
+	mov cx, 16
+	mov ax, 1300h
+	mov bx, 0007h
+	int 10h
+	pop es
+	mov  is_asking_name, 1
+	xor si,si
+	mov di, 2190
+	mov ah, 07h
+@@ask_lop:	
+	hlt 
+    mov    bx, head
+    cmp    bx, tail
+    jz    @@ask_lop
+    call read_buf
+    cmp al, 9ch
+    je @@enter
+    cmp al, 8eh
+    je @@backspace
+    cmp al, 90h
+    jl @@ask_lop
+    cmp al, 0B4h
+    jg @@ask_lop
+    jmp @@add_letter
+@@enter:
+	ret
+@@backspace:
+	test si,si
+	jz @@ask_lop
+	dec si
+	sub di, 2
+	mov al, ' '
+	push es
+	mov dx, 0b800h
+	mov es, dx
+	stosw
+	sub di, 2
+	pop es
+	mov dname[si], al
+	jmp @@ask_lop
+@@add_letter:
+	cmp si, 8
+	je @@ask_lop
+	mov bx, offset alphabet
+	sub al, 90h
+	xlat
+	cmp al, '.'
+	je @@ask_lop
+	mov dname[si], al
+	push es
+	mov dx, 0b800h
+	mov es, dx
+	stosw
+	inc si
+	pop es
+	jmp @@ask_lop
 
 ask_name endp
 
@@ -74,6 +138,9 @@ read_score proc
 @@error:
 	jmp GAMEOVER
 read_score endp
-dname db '________'
+is_asking_name db 0
+dname db '        '
+uname db 'Write your name:'
+alphabet db 'QWERTYUIOP{}..ASDFGHJKL:"...ZXCVBNM<>?'
 score_board:
 org 512h

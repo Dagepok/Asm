@@ -14,12 +14,12 @@ start:
     call read_score
     jmp main
 
+include Fruit.asm
 include board.asm
 include walls.asm
 include dir.asm
 include ints.asm
 include buffer.asm
-include Fruit.asm
 include Draw.asm
 
 reboot:
@@ -215,14 +215,8 @@ mainLoop:
 main endp
 
 GAMEOVER proc near
-  call write_score
-@@over_lop:
-  mov is_game_over, 1
-  hlt
-  mov    bx, head
-  cmp    bx, tail
-  jz    @@over_lop
-  mov bp, offset game_over
+	mov is_game_over, 1
+	mov bp, offset game_over
   mov cx, 9 
   mov dx, 0B28h
   push es
@@ -232,6 +226,16 @@ GAMEOVER proc near
   mov bx, 0004h
   int 10h
   pop es
+  cmp score_added, 1
+  je @@over_lop
+  jmp write_score
+
+@@over_lop:
+  
+  hlt
+  mov    bx, head
+  cmp    bx, tail
+  jz    @@over_lop
   call read_buf
   cmp al, 4
   jne @@over_lop
@@ -239,7 +243,7 @@ GAMEOVER proc near
 GAMEOVER endp
 
 
-
+score_added db 0
 working db 1
 time_tick db 0
 ticks_count db 0

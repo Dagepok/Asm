@@ -9,7 +9,7 @@ isFruitAlive proc near
     call get_random_num
     push ax
     xor ah,ah
-    mov bl, 120
+    mov bl, 140
     div bl
     mov fruit.X, ah
     add fruit.X, 38
@@ -53,6 +53,9 @@ isFruitAlive endp
 
 fruit_eaten:
     mov ax, fruit
+    ;xchg ah, al
+    ;cmp snake[0], ax
+    ;jne @@not_eaten
     cmp snake[0].X, al 
     jne @@not_eaten
     cmp snake[0].Y, ah

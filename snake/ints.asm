@@ -33,7 +33,10 @@ new_int9 proc
 cli
     push ax
     in    al, 60h
-
+    cmp is_asking_name, 0
+    je @@play
+    jmp @@write_name
+@@play:
     cmp al, 82h
     je @@set_speed_lvl
     cmp al, 83h
@@ -119,6 +122,18 @@ cli
     pop ax
   sti
   iret
+@@write_name:
+    cmp al, 9ch
+    je @@write
+    cmp al, 8Eh
+    je @@write
+    cmp al, 90h
+    jl @@exit
+    cmp al, 0B4h
+    jg @@exit
+@@write:
+    push ax
+    jmp @@write_to_buf
 
 new_int9 endp
 

@@ -13,7 +13,9 @@ get_random_num proc
  
 @@fetch_seed:
   push  ds 
-  push  0040h
+  mov ax, 40h
+  push ax
+  ;push  0040h
   pop   ds
   mov   ax,word[ds:006ch]    ;считать текущее число тактов таймера
   pop   ds
