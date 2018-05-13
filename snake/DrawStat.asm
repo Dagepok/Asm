@@ -8,6 +8,7 @@ drawstat proc near
   call @@drawSize
   call @@draw_time
   call @@drawGameName
+  call @@drawScoreBoard
   ret
 @@drawSpeed:
   mov bp, offset speed_text
@@ -17,7 +18,7 @@ drawstat proc near
   mov al, speed_level
   xor ah,ah
   inc al
-  mov di, 834
+  mov di, 832
   call write_num_in_ax
   ret
 @@drawSize:
@@ -29,7 +30,7 @@ drawstat proc near
   mov bl, 2
   div bl
   xor ah,ah
-  mov di, 1154
+  mov di, 1152
   call write_num_in_ax
   ret
 @@drawScore: 
@@ -38,7 +39,7 @@ drawstat proc near
   mov dx, 0303h
   call write_string
   mov ax, score
-  mov di, 502
+  mov di, 500
   call write_num_in_ax
   ret
 @@draw_time:
@@ -52,7 +53,7 @@ drawstat proc near
   ret
 @@drawSeparator:
   mov di, 38
-  mov al, 0b1h
+  mov al, 0b0h
   mov cx, 25
   mov dx, 158
   call @@drawSepl
@@ -73,6 +74,39 @@ drawstat proc near
   mov cx, 10
   call write_string
   ret
+@@drawScoreBoard:
+  mov cx, 10
+  mov bp, offset scn
+  mov dx, 0B03h
+  call write_string
+  mov di, 2108
+  mov bp, offset score_board - 10
+   mov dx, 0B03h
+  call @@drawScoreLine
+  mov di, 2428
+  mov dx, 0D03h
+  call @@drawScoreLine
+   mov di, 2748
+   mov dx, 0F03h
+  call @@drawScoreLine
+  mov di, 3068
+  mov dx, 1103h
+  call @@drawScoreLine
+   mov di, 3388
+   mov dx, 1303h
+  call @@drawScoreLine
+  ret
+
+@@drawScoreLine:
+  add bp, 10
+  mov cx, 8
+  add dh, 2
+  call write_string
+  mov ax, [bp+8]
+  call write_num_in_ax
+  add di, 318
+  ret
+
 write_string: ;в cx - длина строки, в bp - offset строки dx - позиция
   push ax
   push es
@@ -85,3 +119,5 @@ write_string: ;в cx - длина строки, в bp - offset строки dx -
   pop ax
   ret
 drawstat endp
+
+scn db 'Scoreboard'

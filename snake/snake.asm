@@ -1,5 +1,6 @@
 .model tiny
 .data
+
 pos struc
 X db ?
 Y db ?
@@ -10,14 +11,17 @@ org 100h
 start:
     call _change_int8h
     call _change_int9h
+    call read_score
     jmp main
 
+include board.asm
 include walls.asm
 include dir.asm
 include ints.asm
 include buffer.asm
 include Fruit.asm
 include Draw.asm
+
 reboot:
   int 19h
 
@@ -211,11 +215,13 @@ mainLoop:
 main endp
 
 GAMEOVER proc near
+  call write_score
+@@over_lop:
   mov is_game_over, 1
   hlt
   mov    bx, head
   cmp    bx, tail
-  jz    GAMEOVER
+  jz    @@over_lop
   mov bp, offset game_over
   mov cx, 9 
   mov dx, 0B28h
@@ -228,9 +234,11 @@ GAMEOVER proc near
   pop es
   call read_buf
   cmp al, 4
-  jne GAMEOVER
+  jne @@over_lop
   jmp reboot
 GAMEOVER endp
+
+
 
 working db 1
 time_tick db 0
