@@ -17,7 +17,7 @@ get_random_num proc
   push ax
   ;push  0040h
   pop   ds
-  mov   ax,word[ds:006ch]    ;считать текущее число тактов таймера
+  mov   ax, word[ds:006ch]    ;считать текущее число тактов таймера
   pop   ds
   jmp   @@randomize            
  

@@ -67,12 +67,12 @@ ask_name proc
 	mov dx, 0D25h
 	mov cx, 16
 	mov ax, 1300h
-	mov bx, 0007h
+	mov bx, 0107h
 	int 10h
 	pop es
 	mov  is_asking_name, 1
 	xor si,si
-	mov di, 2190
+	mov di, 6286
 	mov ah, 07h
 @@ask_lop:	
 	hlt 

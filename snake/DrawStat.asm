@@ -1,7 +1,7 @@
 
 include drawN.asm
 
-drawstat proc near
+drawstat proc 
   call @@drawSeparator
   call @@drawScore
   call @@drawSpeed

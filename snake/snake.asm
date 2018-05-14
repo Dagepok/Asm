@@ -9,6 +9,9 @@ pos ends
 locals
 org 100h
 start:
+	mov ax, 0501h
+	int 10h
+	call remove_cursor
     call _change_int8h
     call _change_int9h
     call read_score
@@ -76,6 +79,7 @@ mainLoop:
   call @@speed_up
   call change_direction
   inc moves_count
+  call check_portal
   mov ah, moves_count
   cmp ah, moves_per_up
   jne @@move_it
@@ -136,6 +140,7 @@ mainLoop:
     ret 
 
 @@check_poses:
+	
     call @@check_crossing
     call check_walls
     xor si,si
@@ -212,6 +217,7 @@ mainLoop:
     cmp si, snake_size
     jne @@check_next
     ret
+
 main endp
 
 GAMEOVER proc near
@@ -223,7 +229,7 @@ GAMEOVER proc near
   push cs
   pop es
   mov ax, 1300h
-  mov bx, 0004h
+  mov bx, 0104h
   int 10h
   pop es
   cmp score_added, 1
@@ -241,7 +247,35 @@ GAMEOVER proc near
   jne @@over_lop
   jmp reboot
 GAMEOVER endp
-
+check_portal:
+	mov cx, snake[0]
+	xchg ch, cl
+	call get_position
+	cmp di, portal1
+	je @@portal1
+	cmp di, portal2
+	je @@portal2
+	cmp di, portal3
+	je @@portal3
+	cmp di, portal4
+	je @@portal4
+	ret
+@@portal2:
+	mov snake[0].X, 100
+	mov snake[0].Y, 5
+	ret
+@@portal1:
+	mov snake[0].X, 60
+	mov snake[0].Y, 19
+	ret
+@@portal3:
+	mov snake[0].X, 140
+	mov snake[0].Y, 22
+	ret
+@@portal4:
+	mov snake[0].X, 50
+	mov snake[0].Y, 6
+	ret
 
 score_added db 0
 working db 1
