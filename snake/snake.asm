@@ -86,6 +86,8 @@ mainLoop:
   call @@add_size
   mov moves_count, 0
 @@move_it:
+  mov di, snake_size
+  shr di, 1
   mov bx, snake_size  ;индекс последнего
   mov si, snake_size  ;индекс предпоследнего
   sub si, 2
@@ -96,6 +98,9 @@ mainLoop:
 @@reverse:
 	mov cx, snake[si]
     mov snake[bx], cx
+    mov cl, snake_gr[di-1]
+    mov snake_gr[di], cl
+    dec di
     sub si, 2
     sub bx, 2
     cmp bx, 0  
@@ -303,6 +308,7 @@ fruit pos <255,255>
 speed_up_size db 12
 speed_upped db 0
 snake_size dw 8 ;Указывается в 2 раза больше(реальное значение = snake_size/2)
+snake_gr db 01h, 0cdh, 0cdh, 0cdh, 508 dup(7)
 snake pos <62,3>, <60, 3>,<58, 3>,<56, 3>
 
 end start

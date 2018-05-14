@@ -7,8 +7,9 @@ draw proc
     mov   ax, 0b800h
     mov   es, ax
     mov   ah, 02h
-    mov   al, 07h
+    ;mov   al, 07h
     mov si, 0
+    mov bx, 0
     jmp drawpos
 draw_fruit:
   mov al, '*'
@@ -23,8 +24,10 @@ drawpos:
     je end_draw
     mov ch, snake[si].X
     mov cl, snake[si].Y
+    mov al, snake_gr[bx]
     call get_position
     stosw
+    inc bx 
     add si, 2
     jmp drawpos
 get_position:
