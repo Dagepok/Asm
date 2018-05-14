@@ -14,7 +14,7 @@ write_score proc
 	mov bx, offset score_board
 	int 13h
 	pop es
-	ret
+	jmp draw
 write_score endp
 
 set_current proc
@@ -55,7 +55,8 @@ set_current proc
 @@end:
 	mov is_asking_name, 0
 	mov score_added, 1
-	jmp draw
+	ret
+	
 set_current endp
 
 ask_name proc
